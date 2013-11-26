@@ -1,0 +1,11 @@
+menu "System configuration"
+comment "Set system configuration"
+choice
+	prompt "Logging mechanism"
+	default ECL_SYS_LOG_PRINTF
+config ECL_SYS_LOG_PRINTF
+	bool "printf"
+config ECL_SYS_LOG_ZLOG
+	bool "zlog"
+endchoice
+endmenu

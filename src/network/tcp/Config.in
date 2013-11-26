@@ -1,0 +1,8 @@
+
+config ECL_SRC_NETWORK_TCP_CLIENT
+	bool "add tcp client function"
+	default n
+
+config ECL_SRC_NETWORK_TCP_SERVER
+	bool "add tcp server function"
+	default n
