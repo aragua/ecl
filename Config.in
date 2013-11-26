@@ -17,6 +17,12 @@ config ECL_LD
 config ECL_LDFLAGS
 	string "Linker flags"
 	default "-L."
+config ECL_AR
+	string "Archiver path"
+	default "/usr/bin/ar"
+config ECL_ARFLAGS
+	string "Archiver flags"
+	default ""
 config ECL_STATIC
 	bool "Compile static library"
 	default n

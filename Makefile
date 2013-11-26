@@ -48,11 +48,21 @@ include src/src.mk
 endif
 endif
 
+ifeq ($(CONFIG_ECL_STATIC),)
+CONFIG_ECL_CFLAGS+="-fPIC
+
 all: #$(TARGET_OBJS)
 	@echo $(TARGET_OBJS)
 	@echo $(TARGET_HDRS)
 	@echo $(TARGETS)
-	@echo $(CONFIG_ECL_LD) $(CONFIG_ECL_LDFLAGS) -shared $(TARGET_OBJS)
+ifeq ($(CONFIG_ECL_STATIC),y)
+	@echo $(CONFIG_ECL_AR) rcs libecl.a $(TARGET_OBJS)
+else
+	@echo $(CONFIG_ECL_LD) -shared -o libecl.so $(TARGET_OBJS) $(CONFIG_ECL_LDFLAGS)
+endif
+endif
+
+$(TARGET_OBJS):
 
 
 clean:
