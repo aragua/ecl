@@ -1,8 +1,3 @@
-#
-# For a description of the syntax of this configuration file,
-# see scripts/config-language.txt.
-#
-
 menu "Build option"
 comment "Set build configuration"
 config ECL_CC
@@ -17,6 +12,10 @@ config ECL_LD
 config ECL_LDFLAGS
 	string "Linker flags"
 	default "-L."
+config ECL_LIBS
+	string "Libraries to link with"
+	help
+		Library parameters to pass to CC ex: -lpthread
 config ECL_AR
 	string "Archiver path"
 	default "/usr/bin/ar"
@@ -35,62 +34,3 @@ source system/Config.in
 
 source src/Config.in
 
-#menu "Example Menuconfig"
-#config String_Example
-#	string "String Example"
-#	default "abcdef"
-#	
-#config INT_Example
-#	int "Support int file"
-#	depends on  Depend_1_example && Depend_2_example 
-#	default 10
-#	help
-#	  INT_Example: default = 10.
-#	  
-#config Bool_1_Example
-#	bool "Bool 1 Example"
-#	depends on  Depend_1_example || Depend_2_example
-#	default n
-#	help
-#	  Bool_1_Example: default false.
-#
-#config Bool_2_Example
-#	bool "Bool 2 Example"
-#	depends on Depend_1_example || Depend_2_example
-#	default n
-#	select Bool_1_Example
-#
-#
-#config Depend_1_example
-#	bool "Depend 1 example"
-#	default n
-#
-#
-#
-#config Depend_2_example
-#	bool "Depend 2 example"
-#	default n
-#	help
-#	  Even small dogs may be forbidden on public transport and in shopping malls and
-#	  supermarkets.
-#
-#	  Note Other provisions will address where dogs can be walked and who's responsible 
-#	  for any messes they leave behind.
-#	  
-#choice
-#	prompt "Multi Selection"
-#	default OPTION_1
-#
-#
-#config OPTION_1
-#	bool "OPTION 1"
-#
-#config OPTION_2
-#	bool "OPTION 2"
-#
-#config OPTION_3
-#	bool "OPTION 3"
-#
-#endchoice
-#endmenu
-#comment "Applets"

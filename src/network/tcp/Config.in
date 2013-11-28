@@ -1,8 +1,13 @@
 
+config ECL_SRC_NETWORK_TCP
+	bool "Basic tcp/ip client and server
+
 config ECL_SRC_NETWORK_TCP_CLIENT
 	bool "add tcp client function"
+	depends on ECL_SRC_NETWORK_TCP
 	default n
 
 config ECL_SRC_NETWORK_TCP_SERVER
 	bool "add tcp server function"
+	depends on ECL_SRC_NETWORK_TCP
 	default n
