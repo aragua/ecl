@@ -21,7 +21,7 @@
 
 #BASE=${shell pwd}
 BASE=.
-TOOLS=$(BASE)/tools
+TOOLS=${shell pwd}/tools
 OUTPUT=$(BASE)/output
 BINDIR=$(OUTPUT)/bin
 LIBDIR=$(OUTPUT)/lib
