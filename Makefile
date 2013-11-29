@@ -82,10 +82,10 @@ ifeq ($(CONFIG_ECL_STATIC),)
 CONFIG_ECL_CFLAGS+="-fPIC"
 endif
 
-CC=$(call qstrip,$(CONFIG_ECL_CC))
+CC=$(if $(CONFIG_ECL_CC),$(call qstrip,$(CONFIG_ECL_CC)),CC)
 CFLAGS=$(call qstrip,$(CONFIG_ECL_CFLAGS))
-AR=$(call qstrip,$(CONFIG_ECL_AR))
-LD=$(call qstrip,$(CONFIG_ECL_LD))
+AR=$(if $(CONFIG_ECL_AR),$(call qstrip,$(CONFIG_ECL_AR)),AR)
+LD=$(if $(CONFIG_ECL_LD),$(call qstrip,$(CONFIG_ECL_LD)),LD)
 LDFLAGS=$(call qstrip,$(CONFIG_ECL_LDFLAGS))
 LIBS=$(call qstrip,$(CONFIG_ECL_LIBS))
 
