@@ -9,23 +9,30 @@
 #include <unistd.h>
 #include <errno.h>
 
-#include "client.h"
+#include "server.h"
 
-int net_callback( int sock, void * params )
+int net_callback( int sock, struct sockaddr_in * from, void * params )
 {
 	char buffer[256];
+	write( sock, "tcp server\n", 11 );
 	read( sock, buffer, 255 );
 	printf("%s\n",buffer);
-	write( sock, "hello\n", 6 );
 	return 0;
 }
 
 int main(int argc, char *argv[])
 {
+	tcp_server_t ctx;
 
-	if ( ecl_start_tcp_client( "localhost", 8080, net_callback, NULL ) < 0 )
+	ctx.ip=NULL;
+	ctx.port=8080;
+	ctx.clt_nbr=1;
+	ctx.callback=net_callback;
+	ctx.prvt_data=NULL;
+
+	if ( ecl_start_tcp_server( &ctx ) < 0 )
 	{
-		perror("ecl_start_tcp_client");
+		perror("ecl_start_tcp_server");
 		return -1;
 	}
 	

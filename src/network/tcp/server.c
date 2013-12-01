@@ -26,9 +26,14 @@ int ecl_start_tcp_server( tcp_server_t * ctx )
 	/* Initialize socket structure */
 	memset( &ctx->addr, 0, sizeof(struct sockaddr_in));
 	ctx->addr.sin_family = AF_INET;
-	ctx->addr.sin_addr.s_addr = inet_addr(ctx->ip);
-	if( ctx->addr.sin_addr.s_addr == (unsigned long)INADDR_NONE)
+	if ( !ctx->ip )
 		ctx->addr.sin_addr.s_addr = INADDR_ANY;
+	else
+	{
+		ctx->addr.sin_addr.s_addr = inet_addr(ctx->ip);
+		if( ctx->addr.sin_addr.s_addr == (unsigned long)INADDR_NONE)
+			ctx->addr.sin_addr.s_addr = INADDR_ANY;
+	}
 	ctx->addr.sin_port = htons(ctx->port);
 
 	/* Now bind the host address using bind() call.*/
