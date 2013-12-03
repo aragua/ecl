@@ -1,13 +1,25 @@
 
 ifeq ($(CONFIG_ECL_SYS_LOG_PRINTF),y)
-SYSTEM_LOG_SRCS=printf.c
-SYSTEM_LOG_HDRS=printf.h
+SYSTEM_LOG_SRCS+=printf.c
+SYSTEM_LOG_HDRS+=printf.h
 else ifeq ($(CONFIG_ECL_SYS_LOG_ZLOG),y)
-SYSTEM_LOG_SRCS+=
-SYSTEM_LOG_SRCS+=
-else
-$(error Unknown logging system)
+SYSTEM_LOG_HDRS+=log.h
 endif
 
-TARGETS+= SYSTEM_LOG
+ifeq ($(CONFIG_ECL_SYS_BASE_WAIT),y)
+SYSTEM_BASE_SRCS+=wait.c
+SYSTEM_BASE_HDRS+=wait.h
+endif
+
+ifeq ($(CONFIG_ECL_SYS_BASE_STRUCT_FIFO),y)
+SYSTEM_BASE_SRCS+=fifo.c
+SYSTEM_BASE_HDRS+=fifo.h
+endif
+
+ifeq ($(CONFIG_ECL_SYS_BASE_STRUCT_LIFO),y)
+SYSTEM_BASE_SRCS+=lifo.c
+SYSTEM_BASE_HDRS+=lifo.h
+endif
+
+TARGETS+= SYSTEM_LOG SYSTEM_BASE
 

@@ -1,5 +1,6 @@
 menu "System configuration"
 comment "Set system configuration"
+
 choice
 	prompt "Logging mechanism"
 	default ECL_SYS_LOG_PRINTF
@@ -8,4 +9,27 @@ config ECL_SYS_LOG_PRINTF
 config ECL_SYS_LOG_ZLOG
 	bool "zlog"
 endchoice
+
+config ECL_SYS_BASE_STRUCT
+	bool "Implements basic structure"
+	default n
+
+config ECL_SYS_BASE_STRUCT_FIFO
+	bool "Enable FIFO"
+	depends on ECL_SYS_BASE_STRUCT
+	default n
+
+config ECL_SYS_BASE_STRUCT_LIFO
+	bool "Enable LIFO"
+	depends on ECL_SYS_BASE_STRUCT
+	default n
+
+config ECL_SYS_BASE_THREAD
+	bool "Enable multi threading"
+	default y
+
+config ECL_SYS_BASE_WAIT
+	bool "inter thread wait and signal"
+	default n
+
 endmenu

@@ -88,6 +88,10 @@ LD=$(if $(CONFIG_ECL_LD),$(call qstrip,$(CONFIG_ECL_LD)),LD)
 LDFLAGS=$(call qstrip,$(CONFIG_ECL_LDFLAGS))
 LIBS=$(call qstrip,$(CONFIG_ECL_LIBS))
 
+ifeq ($(CONFIG_ECL_SYS_BASE_THREAD),y)
+CFLAGS+= -DECL_THREAD_ENABLED=1
+LDFLAGS+= -lpthread
+endif
 
 FINAL_TARGETS=$(foreach target,$(TARGETS),$(call var_to_targets,$(target)) )
 
@@ -128,6 +132,10 @@ start_header: $(INCDIR)
 	@echo "#ifndef ECL_H" > $(INCDIR)/ecl.h
 	@echo "#define ECL_H" >> $(INCDIR)/ecl.h
 	@echo "" >> $(INCDIR)/ecl.h
+ifeq ($(CONFIG_ECL_SYS_BASE_THREAD),y)
+	@echo "#include <pthread.h>" >> $(INCDIR)/ecl.h
+	@echo "" >> $(INCDIR)/ecl.h
+endif
 
 finalize_header:
 	@echo "" >> $(INCDIR)/ecl.h
