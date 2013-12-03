@@ -36,6 +36,11 @@ TARGET_OBJS=
 TARGET_HDRS=
 TARGET_TESTS=
 
+noconfig_targets:=menuconfig nconfig gconfig xconfig config oldconfig randconfig \
+	%_defconfig allyesconfig allnoconfig silentoldconfig release \
+	randpackageconfig allyespackageconfig allnopackageconfig \
+	source-check print-version olddefconfig
+
 ifeq ($(filter $(noconfig_targets),$(MAKECMDGOALS)),)
 ifeq ($(shell ls $(CONFIG)  2> /dev/null),)
 $(error No .config : do make menuconfig)
@@ -70,12 +75,6 @@ get_headers=$(foreach hdr,$($(call upper_case,$(notdir $(basename $1)))_HDRS),$(
 create_headers=$(foreach hdr,$(call get_headers,$1), cp $(hdr) $(INCDIR)/$(call new_hdr_name,$1,$(hdr)) ; echo \\\#include \"$(call new_hdr_name,$1,$(hdr))\" >> $1 ; )
 
 var_to_targets=$(call var_to_obj,$1) $(call var_to_hdr,$1) $(call var_to_test,$1)
-
-
-noconfig_targets:=menuconfig nconfig gconfig xconfig config oldconfig randconfig \
-	%_defconfig allyesconfig allnoconfig silentoldconfig release \
-	randpackageconfig allyespackageconfig allnopackageconfig \
-	source-check print-version olddefconfig
 
 
 ifeq ($(CONFIG_ECL_STATIC),)
