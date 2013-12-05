@@ -22,7 +22,7 @@ typedef struct
 #endif
 } ecl_fifo_t;
 
-int ecl_fifo_init( ecl_fifo_t * fifo, size_t entry_sz );
+int ecl_fifo_init( ecl_fifo_t * fifo );
 int ecl_fifo_push( ecl_fifo_t * fifo, void * data );
 int ecl_fifo_pop( ecl_fifo_t * fifo, void ** data );
 size_t ecl_fifo_count( ecl_fifo_t * fifo );
