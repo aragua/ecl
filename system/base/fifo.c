@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 
-int ecl_fifo_init( ecl_fifo_t * fifo, size_t entry_sz )
+int ecl_fifo_init( ecl_fifo_t * fifo )
 {
 	if ( !fifo )
 		return -1;
