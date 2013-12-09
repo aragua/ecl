@@ -29,6 +29,7 @@ INCDIR=$(OUTPUT)/include
 MCONF=$(TOOLS)/bin/kconfig-mconf
 KCONFIG_ENTRY=Config.in
 CONFIG=$(BASE)/.config
+INTERNAL=$(OUTPUT)/internal
 
 TARGETS=
 
@@ -73,6 +74,7 @@ obj_to_src=$(foreach file,$($(call obj_to_var,$1)_SRCS), $(call obj_to_folder,$1
 new_hdr_name=$(basename $(subst $(INCDIR)/,,$(notdir $1)))_$(notdir $2)
 get_headers=$(foreach hdr,$($(call upper_case,$(notdir $(basename $1)))_HDRS),$(call var_to_path,$(notdir $(basename $1)))/$(hdr))
 create_headers=$(foreach hdr,$(call get_headers,$1), cp $(hdr) $(INCDIR)/$(call new_hdr_name,$1,$(hdr)) ; echo \\\#include \"$(call new_hdr_name,$1,$(hdr))\" >> $1 ; )
+copy_headers=$(foreach hdr,$1, install -D -m 0755 $(hdr) $(INTERNAL)/$(hdr) ; echo \\\#include \"$(hdr)\" >> $(INTERNAL)/internals.h ; )
 
 var_to_targets=$(call var_to_obj,$1) $(call var_to_hdr,$1) $(call var_to_test,$1)
 
@@ -94,8 +96,9 @@ LDFLAGS+= -lpthread
 endif
 
 FINAL_TARGETS=$(foreach target,$(TARGETS),$(call var_to_targets,$(target)) )
+INTERNAL_HDRS=$(foreach target,$(TARGETS),$(foreach hdr,$($(target)_HDRS),$(call var_to_path,$(target))/$(hdr)))
 
-all : see_targets $(OUTPUT) $(BINDIR) $(LIBDIR) $(INCDIR) start_header $(FINAL_TARGETS) finalize_header
+all : see_targets internal_headers $(OUTPUT) $(BINDIR) $(LIBDIR) $(INCDIR) start_header $(FINAL_TARGETS) finalize_header
 	@echo
 	@echo "Linking $(TARGETS)"
 ifeq ($(CONFIG_ECL_STATIC),y)
@@ -108,12 +111,22 @@ endif
 see_targets:
 	@echo
 	@echo "Building targets:"
+	@echo $(TARGETS)
+	@echo "Building final targets:"
 	@echo $(FINAL_TARGETS)
 	@echo
 
+internal_headers: $(INTERNAL)
+	@echo "#ifndef ECL_INTERNAL_H" > $(INTERNAL)/internals.h
+	@echo "#define ECL_INTERNAL_H" >> $(INTERNAL)/internals.h
+	@echo "" >> $(INTERNAL)/internals.h
+	$(call copy_headers,$(INTERNAL_HDRS))
+	@echo "" >> $(INTERNAL)/internals.h
+	@echo "#endif /* ECL_INTERNAL_H */" >> $(INTERNAL)/internals.h
+	@echo
 
 %.o:%.c
-	$(CC) $(CFLAGS) -c $< -o $@ -I$(@D) -I$(INCDIR)
+	$(CC) $(CFLAGS) -c $< -o $@ -I$(@D) -I$(INTERNAL)
 
 $(INCDIR)/%.h:
 	@echo "#ifndef $(call upper_case,$(subst .,_,$(@F)))" > $@
@@ -125,7 +138,7 @@ $(INCDIR)/%.h:
 	@echo "#include \"$(@F)\"" >> $(INCDIR)/ecl.h
 
 %.test:%.c
-	$(CC) $(CFLAGS) -o $@ $< $(@D)/*.o -I$(@D) -I$(INCDIR)
+	$(CC) $(CFLAGS) -o $@ $< $(@D)/*.o -I$(@D) -I$(INTERNAL)
 	mv $@ $(BINDIR)/$(basename $(subst /,-,$@))
 
 start_header: $(INCDIR)
@@ -155,7 +168,7 @@ $(MCONF): $(TOOLS)
 	make -C kconfig-frontends-3.12.0.0 install
 	rm -rf kconfig-frontends-3.12.0.0*
 	
-$(TOOLS) $(OUTPUT) $(BINDIR) $(LIBDIR) $(INCDIR): 
+$(TOOLS) $(OUTPUT) $(BINDIR) $(LIBDIR) $(INCDIR) $(INTERNAL): 
 	@mkdir -p $@
 	
 .PHONY: all build clean menuconfig start_header finalize_header

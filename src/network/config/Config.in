@@ -1,0 +1,9 @@
+
+config ECL_SRC_NETWORK_CONFIG
+	bool "Configure network interfaces"
+
+config ECL_SRC_NETWORK_CONFIG_SETIP
+	bool "add function to change ip address"
+	depends on ECL_SRC_NETWORK_CONFIG
+	default n
+

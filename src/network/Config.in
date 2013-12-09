@@ -1,3 +1,4 @@
 menu "Network features"
 source src/network/tcp/Config.in
+source src/network/config/Config.in
 endmenu
