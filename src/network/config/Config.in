@@ -7,3 +7,7 @@ config ECL_SRC_NETWORK_CONFIG_SETIP
 	depends on ECL_SRC_NETWORK_CONFIG
 	default n
 
+config ECL_SRC_NETWORK_CONFIG_NETIFACE
+	bool "Get information on network interfaces"
+	depends on ECL_SRC_NETWORK_CONFIG
+	default n
