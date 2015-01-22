@@ -76,8 +76,8 @@ get_headers=$(foreach hdr,$($(call upper_case,$(notdir $(basename $1)))_HDRS),$(
 create_headers=$(foreach hdr,$(call get_headers,$1), cp $(hdr) $(INCDIR)/$(call new_hdr_name,$1,$(hdr)) ; echo \\\#include \"$(call new_hdr_name,$1,$(hdr))\" >> $1 ; )
 copy_headers=$(foreach hdr,$1, install -D -m 0755 $(hdr) $(INTERNAL)/$(hdr) ; echo \\\#include \"$(hdr)\" >> $(INTERNAL)/internals.h ; )
 
-var_to_targets=$(call var_to_obj,$1) $(call var_to_hdr,$1) $(call var_to_test,$1)
-
+var_to_targets=$(call var_to_obj,$1) $(call var_to_hdr,$1)
+var_to_tests= $(call var_to_test,$1)
 
 ifeq ($(CONFIG_ECL_STATIC),)
 CONFIG_ECL_CFLAGS+="-fPIC"
@@ -96,17 +96,22 @@ LDFLAGS+= -lpthread
 endif
 
 FINAL_TARGETS=$(foreach target,$(TARGETS),$(call var_to_targets,$(target)) )
+FINAL_TESTS=$(foreach target,$(TARGETS),$(call var_to_tests,$(target)) )
 INTERNAL_HDRS=$(foreach target,$(TARGETS),$(foreach hdr,$($(target)_HDRS),$(call var_to_path,$(target))/$(hdr)))
 
-all : see_targets internal_headers $(OUTPUT) $(BINDIR) $(LIBDIR) $(INCDIR) start_header $(FINAL_TARGETS) finalize_header
+all : library $(FINAL_TESTS)
+
+library: see_targets internal_headers $(OUTPUT) $(BINDIR) $(LIBDIR) $(INCDIR) start_header $(FINAL_TARGETS) finalize_header
 	@echo
-	@echo "Linking $(TARGETS)"
+	@echo "# Linking $(TARGETS)"
 ifeq ($(CONFIG_ECL_STATIC),y)
 	@echo $(AR) rcs $(LIBDIR)/libecl.a $(TARGET_OBJS)
 else
 	$(LD) -shared -o $(LIBDIR)/libecl.so $(filter %.o,$(FINAL_TARGETS)) $(LDFLAGS) $(LIBS)
 endif
 	@echo
+
+
 
 see_targets:
 	@echo
@@ -138,7 +143,8 @@ $(INCDIR)/%.h:
 	@echo "#include \"$(@F)\"" >> $(INCDIR)/ecl.h
 
 %.test:%.c
-	$(CC) $(CFLAGS) -o $@ $< $(@D)/*.o -I$(@D) -I$(INTERNAL)
+	@echo "# Building test $@"
+	$(CC) $(CFLAGS) -o $@ $< $(@D)/*.o -I$(@D) -I$(INTERNAL) -L$(LIBDIR)/ -lecl
 	mv $@ $(BINDIR)/$(basename $(subst /,-,$@))
 
 start_header: $(INCDIR)
@@ -157,18 +163,23 @@ finalize_header:
 clean:
 	rm -rf $(OUTPUT) $(filter %.o,$(FINAL_TARGETS)) $(filter %.test,$(FINAL_TARGETS))
 
+cleantools:
+	rm -rf $(TOOLS)
+
 menuconfig: $(MCONF) $(KCONFIG_ENTRY)
 	$(MCONF) $(KCONFIG_ENTRY)
 
-$(MCONF): $(TOOLS) 
-	wget http://ymorin.is-a-geek.org/download/kconfig-frontends/kconfig-frontends-3.12.0.0.tar.xz
+$(MCONF): $(TOOLS)
+	#wget https://distfiles.macports.org/kconfig-frontends/kconfig-frontends-3.12.0.0.tar.bz2
+	#wget http://ymorin.is-a-geek.org/download/kconfig-frontends/kconfig-frontends-3.12.0.0.tar.xz
+	wget http://build.gnome.org/ostree/work/build-yocto/downloads/kconfig-frontends-3.12.0.0.tar.xz
 	tar xvf kconfig-frontends-3.12.0.0.tar.xz
 	cd kconfig-frontends-3.12.0.0; ./configure --prefix=$(TOOLS)
 	make -C kconfig-frontends-3.12.0.0
 	make -C kconfig-frontends-3.12.0.0 install
 	rm -rf kconfig-frontends-3.12.0.0*
-	
+
 $(TOOLS) $(OUTPUT) $(BINDIR) $(LIBDIR) $(INCDIR) $(INTERNAL): 
 	@mkdir -p $@
-	
+
 .PHONY: all build clean menuconfig start_header finalize_header
